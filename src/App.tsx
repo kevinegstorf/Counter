@@ -1,4 +1,4 @@
-import { Card, Container, Grid } from "@material-ui/core";
+import { Card, Grid, makeStyles } from "@material-ui/core";
 import React from "react";
 import Counter, {
   CounterDecrementButton,
@@ -6,19 +6,36 @@ import Counter, {
   CounterInput,
 } from "./Counter";
 
+const styles = makeStyles({
+  root: {
+    margin: "10em auto",
+    width: "22%",
+  },
+  gridContainer: {
+    margin: "0 auto",
+  },
+  gridItem: {
+    margin: "0 auto",
+  },
+});
+
 function App() {
+  const classes = styles();
+  // Make state visible and useable
+  // add custom reducer like no negative numbers, max value
+  // make it multiply or add 2
   return (
-    <Container>
-      <Card elevation={4}>
-        <Grid>
+    <Card className={classes.root} elevation={6}>
+      <Grid className={classes.gridContainer} container>
+        <Grid className={classes.gridItem}>
           <Counter value={0}>
             <CounterDecrementButton>-</CounterDecrementButton>
             <CounterInput />
             <CounterIncrementButton>+</CounterIncrementButton>
           </Counter>
         </Grid>
-      </Card>
-    </Container>
+      </Grid>
+    </Card>
   );
 }
 
