@@ -22,4 +22,6 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+  caret-color: transparent;
+  cursor: default;
 }
