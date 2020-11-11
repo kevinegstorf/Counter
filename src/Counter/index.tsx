@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import { Button, TextField, Box, makeStyles } from "@material-ui/core";
+import React, { FC, ReactChild } from "react";
+import { Button, TextField, makeStyles } from "@material-ui/core";
 
 export const actionTypes = {
   increment: "increment",
@@ -11,11 +11,13 @@ const styles = makeStyles({
     fontSize: "2em",
     margin: "10px",
   },
-  input: { verticalAlign: "baseline" },
+  input: {
+    verticalAlign: "baseline",
+  },
 });
 export const CounterContext = React.createContext<any>({});
 
-function countReducer(state = 0, { type, initialState }: any): any {
+export function countReducer(state = 0, { type }: { type: string }) {
   switch (type) {
     case actionTypes.increment: {
       return state + 1;
@@ -29,15 +31,11 @@ function countReducer(state = 0, { type, initialState }: any): any {
   }
 }
 
-type UseCounter = any;
-
-export const useCounter: UseCounter = (reducer = countReducer) => ({});
-
 type CounterProps = {
-  children: any;
+  children: ReactChild[] | ReactChild;
   value: number;
 };
-const Counter: FC<CounterProps> = ({ children, value }) => {
+const Counter: FC<CounterProps> = ({ children, value = 0 }) => {
   const [state, dispatch] = React.useReducer(countReducer, value);
   return (
     <CounterContext.Provider value={{ state, dispatch }}>
@@ -46,13 +44,21 @@ const Counter: FC<CounterProps> = ({ children, value }) => {
   );
 };
 
-export function CounterIncrementButton(props: any) {
+export function CounterIncrementButton({
+  children,
+  onClick,
+}: {
+  children: string;
+  onClick: () => void;
+}) {
   const { dispatch } = React.useContext(CounterContext);
   const classes = styles();
 
   const handleClick = () => {
+    onClick();
     dispatch({ type: actionTypes.increment });
   };
+
   return (
     <Button
       className={classes.button}
@@ -60,17 +66,26 @@ export function CounterIncrementButton(props: any) {
       color="primary"
       onClick={handleClick}
     >
-      {props.children}
+      {children}
     </Button>
   );
 }
 
-export function CounterDecrementButton(props: any) {
+export function CounterDecrementButton({
+  children,
+  onClick,
+}: {
+  children: string;
+  onClick: () => void;
+}) {
   const { dispatch } = React.useContext(CounterContext);
   const classes = styles();
+
   const handleClick = () => {
+    onClick();
     dispatch({ type: actionTypes.decrement });
   };
+
   return (
     <Button
       className={classes.button}
@@ -78,14 +93,16 @@ export function CounterDecrementButton(props: any) {
       color="secondary"
       onClick={handleClick}
     >
-      {props.children}
+      {children}
     </Button>
   );
 }
 
-export function CounterInput({ ...props }) {
+export function CounterInput({ value }: { value: number }) {
   const { state } = React.useContext(CounterContext);
   const classes = styles();
+
+  console.log(state);
   return (
     <TextField
       id="standard-number"
@@ -95,7 +112,7 @@ export function CounterInput({ ...props }) {
       }}
       classes={{ root: classes.input }}
       type="number"
-      value={state}
+      value={value ? value : state}
     />
   );
 }
