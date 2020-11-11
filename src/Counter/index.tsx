@@ -1,10 +1,10 @@
 import React, { FC, ReactChild } from "react";
 import { Button, TextField, makeStyles } from "@material-ui/core";
 
-export const actionTypes = {
-  increment: "increment",
-  decrement: "decrement",
-};
+enum ActionTypes {
+  increment = "increment",
+  decrement = "decrement",
+}
 
 const styles = makeStyles({
   button: {
@@ -15,14 +15,20 @@ const styles = makeStyles({
     verticalAlign: "baseline",
   },
 });
-export const CounterContext = React.createContext<any>({});
 
-export function countReducer(state = 0, { type }: { type: string }) {
+interface IContextProps {
+  state: number;
+  dispatch: ({ type }: { type: ActionTypes }) => void;
+}
+
+const CounterContext = React.createContext({} as IContextProps);
+
+function countReducer(state = 0, { type }: { type: string }) {
   switch (type) {
-    case actionTypes.increment: {
+    case ActionTypes.increment: {
       return state + 1;
     }
-    case actionTypes.decrement: {
+    case ActionTypes.decrement: {
       return state - 1;
     }
     default: {
@@ -33,8 +39,9 @@ export function countReducer(state = 0, { type }: { type: string }) {
 
 type CounterProps = {
   children: ReactChild[] | ReactChild;
-  value: number;
+  value?: number;
 };
+
 const Counter: FC<CounterProps> = ({ children, value = 0 }) => {
   const [state, dispatch] = React.useReducer(countReducer, value);
   return (
@@ -44,23 +51,27 @@ const Counter: FC<CounterProps> = ({ children, value = 0 }) => {
   );
 };
 
-export function CounterIncrementButton({
+function CounterIncrementButton({
   children,
   onClick,
+  disabled = false,
 }: {
   children: string;
-  onClick: () => void;
+  onClick?: (() => void) | undefined;
+  disabled?: boolean;
 }) {
   const { dispatch } = React.useContext(CounterContext);
   const classes = styles();
 
   const handleClick = () => {
-    onClick();
-    dispatch({ type: actionTypes.increment });
+    if (onClick) onClick();
+
+    dispatch({ type: ActionTypes.increment });
   };
 
   return (
     <Button
+      disabled={disabled}
       className={classes.button}
       variant="contained"
       color="primary"
@@ -71,23 +82,27 @@ export function CounterIncrementButton({
   );
 }
 
-export function CounterDecrementButton({
+function CounterDecrementButton({
   children,
   onClick,
+  disabled = false,
 }: {
   children: string;
-  onClick: () => void;
+  onClick?: () => void;
+  disabled?: boolean;
 }) {
   const { dispatch } = React.useContext(CounterContext);
   const classes = styles();
 
   const handleClick = () => {
-    onClick();
-    dispatch({ type: actionTypes.decrement });
+    if (onClick) onClick();
+
+    dispatch({ type: ActionTypes.decrement });
   };
 
   return (
     <Button
+      disabled={disabled}
       className={classes.button}
       variant="contained"
       color="secondary"
@@ -98,23 +113,29 @@ export function CounterDecrementButton({
   );
 }
 
-export function CounterInput({ value }: { value: number }) {
+function CounterInput({ value }: { value?: number }) {
   const { state } = React.useContext(CounterContext);
   const classes = styles();
 
-  console.log(state);
   return (
     <TextField
-      id="standard-number"
       inputProps={{
         min: 0,
         style: { textAlign: "center", fontSize: "2em", maxWidth: "4em" },
       }}
       classes={{ root: classes.input }}
-      type="number"
+      type="text"
       value={value ? value : state}
     />
   );
 }
 
-export default Counter;
+export {
+  Counter,
+  CounterInput,
+  CounterDecrementButton,
+  CounterIncrementButton,
+  CounterContext,
+  countReducer,
+  ActionTypes,
+};
